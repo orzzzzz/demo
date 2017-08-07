@@ -1,0 +1,82 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 开启controller注解支持-->
+    <context:component-scan base-package="com.icinfo.platform.*.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+    <!-- 当在web.xml 中 DispatcherServlet使用 <url-pattern>/</url-pattern> 映射时，能映射静态资源 -->
+    <mvc:default-servlet-handler/>
+    <mvc:view-controller path="/" view-name="redirect:/"/>
+    <!-- 静态资源映射  css、images、js缓存15天 plugins缓存30天 -->
+    <mvc:resources mapping="/css/**" location="/WEB-INF/views/css/" cache-period="0"/>
+    <mvc:resources mapping="/js/lib/**" location="/WEB-INF/views/js/lib/" cache-period="0"/>
+    <mvc:resources mapping="/js/**" location="/WEB-INF/views/js/" cache-period="0"/>
+    <mvc:resources mapping="/img/**" location="/WEB-INF/views/img/" cache-period="0"/>
+
+    <!--ViewResolver-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/page/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--文件上传配置-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"/>
+        <property name="maxInMemorySize" value="10240"/>
+        <!--最大文件大小, 单位字节, -1为不限制大小, 默认5M-->
+        <property name="maxUploadSize" value="5242880"/>
+        <!--文件延迟解析-->
+        <property name="resolveLazily" value="false"/>
+    </bean>
+
+    <!-- jasckson2对象映射-->
+    <!--<bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">-->
+        <!--<property name="serializationInclusion">-->
+            <!--<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">ALWAYS</value>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!-- 配置消息转换服务 -->
+    <!--<mvc:annotation-driven>-->
+        <!--<mvc:message-converters>-->
+            <!--&lt;!&ndash; JSON消息格式器 &ndash;&gt;-->
+            <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
+                <!--<property name="supportedMediaTypes">-->
+                    <!--<list>-->
+                        <!--<value>application/json;charset=UTF-8</value>-->
+                    <!--</list>-->
+                <!--</property>-->
+                <!--<property name="objectMapper" ref="objectMapper"/>-->
+                <!--<property name="prettyPrint" value="true"/>-->
+            <!--</bean>-->
+        <!--</mvc:message-converters>-->
+    <!--</mvc:annotation-driven>-->
+
+    <!--解决@ResponseBody 中文乱码-->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes" value = "text/plain;charset=UTF-8" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 开启cglib代理切面 -->
+    <!-- 由于 controller 与 其他不在同一上下文，针对controller层上的自定义注解，必须在此配置，使得注解跟controller在同一上下文才能生效 -->
+    <!--<aop:aspectj-autoproxy proxy-target-class="true"/>-->
+</beans>
