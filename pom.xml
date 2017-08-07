@@ -170,13 +170,6 @@
         </dependency>
         <!--AOP end-->
 
-        <!--captcha 配置-->
-        <dependency>
-            <groupId>kaptcha</groupId>
-            <artifactId>kaptcha</artifactId>
-            <version>2.3.2_2</version>
-        </dependency>
-
         <!-- log4jdbc -->
         <dependency>
             <groupId>com.googlecode.log4jdbc</groupId>
